@@ -115,8 +115,7 @@ vec3 calculateLighting(in Fragment frag, in LightMap lightmap) {
 
     // Mix the fragments albedo with the various light modifiers and sources
     vec3 litColor = frag.albedo * (directLight + skyLight + torchLight);
-    return litColor;
-    //return mix(litColor, frag.albedo, frag.emission);
+    return mix(litColor, frag.albedo, frag.emission);
 }
 
 void main() {
