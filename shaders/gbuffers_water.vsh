@@ -16,8 +16,7 @@ uniform mat4 gbufferModelViewInverse;
 attribute vec4 mc_Entity;
 
 void main() {
-    vec4 position = gbufferModelViewInverse * gl_ModelViewMatrix * gl_Vertex;
-    gl_Position = gl_ProjectionMatrix * gbufferModelView * position;
+    gl_Position = ftransform();
     texcoord = gl_MultiTexCoord0;
     lmcoord = gl_MultiTexCoord1;
     color = gl_Color.rgb;

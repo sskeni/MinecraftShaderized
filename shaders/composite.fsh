@@ -3,6 +3,7 @@
 #include "/lib/framebuffer.glsl"
 
 const int noiseTextureResolution = 64;
+const float ambientLight = 0.3;
 
 varying vec3 lightVector;
 varying vec3 lightColor;
@@ -10,11 +11,14 @@ varying vec3 skyColor;
 
 uniform sampler2D gdepthtex;
 uniform sampler2D shadow;
+uniform sampler2D shadowcolor0;
+uniform sampler2D noisetex;
 
 uniform float viewWidth;
 uniform float viewHeight;
 
 uniform vec3 cameraPosition;
+
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 shadowModelView;
@@ -65,16 +69,63 @@ vec3 getShadowSpacePosition(in vec2 coord) {
     return positionShadowSpace.xyz * 0.5 + 0.5;
 }
 
+mat2 getRotationMatrix(in vec2 coord) {
+    float rotationAmount = texture2D(
+        noisetex,
+        coord * vec2(
+            viewWidth / noiseTextureResolution,
+            viewHeight / noiseTextureResolution
+        )
+    ).r;
+
+    return mat2(
+        cos(rotationAmount), -sin(rotationAmount),
+        sin(rotationAmount), cos(rotationAmount)
+    );
+}
+
 float getSunVisibility(in vec2 coord) {
     vec3 positionShadowSpace = getShadowSpacePosition(coord);
-    float shadowMapSample = texture2D(shadow, positionShadowSpace.st).r;
-    return step(positionShadowSpace.z - shadowMapSample, 1.0 / shadowMapResolution);
+
+    mat2 rotationMatrix = getRotationMatrix(coord);
+    float visibility = 0;
+    for (int y = -1; y < 2; y++) {
+        for (int x = -1; x < 2; x++) {
+            vec2 offset = vec2(x, y) / shadowMapResolution;
+            offset = rotationMatrix * offset;
+            float shadowMapSample = texture2D(shadow, positionShadowSpace.st + offset).r;
+            visibility += step(positionShadowSpace.z - shadowMapSample, 1.0 / shadowMapResolution);
+        }
+    }
+
+    return visibility * 0.111;
+}
+
+vec3 getShadowColor(in vec2 coord) {
+    vec3 positionShadowSpace = getShadowSpacePosition(coord);
+
+    mat2 rotationMatrix = getRotationMatrix(coord);
+    vec3 shadowColor = vec3(0);
+    for (int y = -1; y < 2; y++) {
+        for (int x = -1; x < 2; x++) {
+            vec2 offset = vec2(x, y) / shadowMapResolution;
+            offset = rotationMatrix * offset;
+            float shadowMapSample = texture2D(shadow, positionShadowSpace.st + offset).r;
+            float visibility = step(positionShadowSpace.z - shadowMapSample, 1.0 / shadowMapResolution);
+
+            vec3 colorSample = texture2D(shadowcolor0, positionShadowSpace.st + offset).rgb;
+            shadowColor += mix(colorSample, vec3(ambientLight), visibility);
+        }
+    }
+
+    return shadowColor;
 }
 
 vec3 calculateLitSurface(in vec3 color) {
-    float sunVisibility = getSunVisibility(texcoord.st);
-    float ambientLighting = 0.3;
-    return color * (sunVisibility + ambientLighting);
+    float shadows = getSunVisibility(texcoord.st);
+    //vec3 coloredShadows = getShadowColor(texcoord.st);
+    vec3 ambientLighting = vec3(ambientLight);
+    return color * (vec3(shadows) + ambientLighting);
 }
 
 //END SHADOW STUFF
@@ -102,7 +153,7 @@ vec3 calculateLighting(in Fragment frag, in LightMap lightmap) {
 
     // Calculate the amount a surface should be lit
     float directLightStrength = dot(frag.normal, lightVector);
-    directLightStrength = max(0.0, directLightStrength);
+    directLightStrength = max(ambientLight, directLightStrength);
     vec3 directLight = directLightStrength * lightColor;
     directLight = calculateLitSurface(directLight); // add shadows
     

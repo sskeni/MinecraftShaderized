@@ -34,20 +34,24 @@ vec3 convertToHDR(in vec3 color) {
 vec3 getExposure(in vec3 color) {
 
     vec3 retColor;
-    color *= 1.115;
+    color *= 1.0;
     retColor = color;
 
     return retColor;
 
 }
 
-// Various tonemaps
+// TONEMAPS
 
 vec3 Reignhard(in vec3 color) {
 
-    color = color/(1 + color);
-    return pow(color, vec3(1 / 2.2));
+    color = color/(1.0 + color);
+    return pow(color, vec3(1.0 / 2.2));
 
+}
+
+vec3 ReignhardAlt(in vec3 color) {
+    return color/(1.0 + color);
 }
 
 vec3 Burgess(in vec3 color) {
@@ -89,6 +93,8 @@ vec3 Uncharted2Tonemap(in vec3 color) {
 
 }
 
+//END TONEMAPS
+
 void main() {
 
     // Parse color
@@ -97,7 +103,12 @@ void main() {
     // Apply filters
     color = convertToHDR(color);
     color = getExposure(color);
+
+    // Apply tonemap
     color = Reignhard(color);
+    //color = ReignhardAlt(color);
+    //color = Burgess(color);
+    //color = Uncharted2Tonemap(color);
 
     // Output color to screen
     gl_FragColor = vec4(color, 1.0f);

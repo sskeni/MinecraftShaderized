@@ -10,5 +10,8 @@ varying float isTransparent;
 
 void main() {
 
-    GCOLOR_OUT = texture2D(tex, texcoord.st);
+    vec3 fragColor = color.rgb * texture2D(tex, texcoord.st).rgb;
+    fragColor = mix(vec3(0), fragColor, isTransparent);
+
+    GCOLOR_OUT = vec4(fragColor, 1.0);
 }
