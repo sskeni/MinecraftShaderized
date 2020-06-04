@@ -28,3 +28,15 @@ Shadows are the main reason I did this project in the first place. I really want
 #### Night Time
 ![](/screenshots/Night.png)
 Here is a screenshot of the above effects but during night. The moon's intensity is 1/10 of the sun's intensity, and makes for a darker scene. The torch lighting is also highlighted in this picture. Something else I wanted to bring up here is that it took a great amount of time to get water and entities (sheep, zombies, etc.) to correctly display light and shadows. This was due to the tomfoolery involved with coding shaders for Minecraft, mainly due to the lack of documentation and tutorials.
+
+### Tonemaps
+Below are a few screenshots of various tonemaps that are implemented in the code. The Reignhard Tonemap is the one used in the above screenshots. Burgess is a more extreme tonemap, hopefully that showcases that they actually are doing something to the final composition.
+
+#### Reignhard
+![](/screenshots/ReignhardTonemap.png)
+
+#### Burgess
+![](/screenshots/BurgessTonemap.png)
+
+#### Uncharted 2
+![](/screenshots/Uncharted2Tonemap.png)
