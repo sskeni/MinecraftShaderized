@@ -27,4 +27,4 @@ Shadows are the main reason I did this project in the first place. I really want
 
 #### Night Time
 ![](/screenshots/Night.png)
-Here is a screenshot of the above effects but during night. The moon's intensity is 1/10 of the sun's intensity, and makes for a darker scene. The torch lighting is also highlighted in this picture.
+Here is a screenshot of the above effects but during night. The moon's intensity is 1/10 of the sun's intensity, and makes for a darker scene. The torch lighting is also highlighted in this picture. Something else I wanted to bring up here is that it took a great amount of time to get water and entities (sheep, zombies, etc.) to correctly display light and shadows. This was due to the tomfoolery involved with coding shaders for Minecraft, mainly due to the lack of documentation and tutorials.
